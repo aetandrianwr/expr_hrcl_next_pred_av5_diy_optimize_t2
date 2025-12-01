@@ -27,6 +27,7 @@ from data.dataset import get_dataloader
 from models.history_centric import HistoryCentricModel
 from models.advanced_transformer_v2 import AdvancedTransformerV2
 from models.optimized_history_transformer import OptimizedHistoryAwareTransformer
+from models.ultra_optimized_history import UltraOptimizedHistoryModel
 from training.trainer_v3 import ProductionTrainer
 
 
@@ -138,6 +139,8 @@ def main():
         model = AdvancedTransformerV2(model_config)
     elif model_name == 'OptimizedHistoryAwareTransformer':
         model = OptimizedHistoryAwareTransformer(model_config)
+    elif model_name == 'UltraOptimizedHistoryModel':
+        model = UltraOptimizedHistoryModel(model_config)
     else:
         model = HistoryCentricModel(model_config)
     num_params = model.count_parameters()
