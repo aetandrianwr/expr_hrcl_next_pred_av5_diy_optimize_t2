@@ -1,0 +1,87 @@
+experiment:
+  name: diy_advanced_transformer
+  description: Advanced Transformer model for DIY next-location prediction
+  dataset: diy_skip_first_part
+  version: '2.0'
+data:
+  dataset_name: diy_skip_first_part
+  data_dir: data/diy_skip_first_part
+  train_file: diy_skip_first_part_transformer_7_train.pk
+  val_file: diy_skip_first_part_transformer_7_validation.pk
+  test_file: diy_skip_first_part_transformer_7_test.pk
+  num_locations: 7038
+  num_users: 693
+  num_weekdays: 7
+  max_seq_len: 60
+model:
+  name: AdvancedTransformerV2
+  loc_emb_dim: 53
+  user_emb_dim: 20
+  temporal_dim: 27
+  d_model: 136
+  nhead: 8
+  num_layers: 3
+  dim_feedforward: 272
+  dropout: 0.15
+  attention_dropout: 0.1
+  use_relative_position: true
+  use_gating: true
+  use_layer_scale: true
+  use_pre_norm: true
+training:
+  batch_size: 128
+  num_epochs: 150
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  grad_clip: 1.0
+  label_smoothing: 0.05
+  optimizer: adamw
+  betas:
+  - 0.9
+  - 0.999
+  eps: 1.0e-08
+  scheduler:
+    type: cosine_annealing
+    patience: 12
+    factor: 0.5
+    min_lr: 1.0e-06
+    warmup_epochs: 5
+    T_max: 30
+  early_stopping:
+    patience: 25
+    metric: val_loss
+    mode: min
+evaluation:
+  metrics:
+  - acc@1
+  - acc@3
+  - acc@5
+  - acc@10
+  - mrr
+  - ndcg
+  - f1
+  save_predictions: false
+system:
+  device: cuda
+  num_workers: 4
+  pin_memory: true
+  seed: 42
+  deterministic: true
+logging:
+  log_interval: 50
+  verbose: true
+  wandb:
+    enabled: false
+    project: next-location-prediction
+    entity: null
+checkpoint:
+  save_best: true
+  save_last: true
+  monitor: val_loss
+  mode: min
+paths:
+  runs_dir: runs
+  results_dir: results
+  checkpoints_dir: results/checkpoints
+  logs_dir: results/logs
+  predictions_dir: results/predictions

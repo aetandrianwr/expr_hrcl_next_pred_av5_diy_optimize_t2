@@ -25,6 +25,8 @@ from utils.results_tracker import ResultsTracker
 from utils.logger import ExperimentLogger
 from data.dataset import get_dataloader
 from models.history_centric import HistoryCentricModel
+from models.advanced_transformer_v2 import AdvancedTransformerV2
+from models.optimized_history_transformer import OptimizedHistoryAwareTransformer
 from training.trainer_v3 import ProductionTrainer
 
 
@@ -118,17 +120,26 @@ def main():
             self.num_weekdays = config_dict.get('data.num_weekdays')
             self.loc_emb_dim = config_dict.get('model.loc_emb_dim')
             self.user_emb_dim = config_dict.get('model.user_emb_dim')
-            self.weekday_emb_dim = config_dict.get('model.weekday_emb_dim')
-            self.time_emb_dim = config_dict.get('model.time_emb_dim')
+            self.weekday_emb_dim = config_dict.get('model.weekday_emb_dim', 4)
+            self.time_emb_dim = config_dict.get('model.time_emb_dim', 8)
+            self.temporal_dim = config_dict.get('model.temporal_dim', 32)
             self.d_model = config_dict.get('model.d_model')
             self.nhead = config_dict.get('model.nhead')
             self.num_layers = config_dict.get('model.num_layers')
             self.dim_feedforward = config_dict.get('model.dim_feedforward')
             self.dropout = config_dict.get('model.dropout')
+            self.attention_dropout = config_dict.get('model.attention_dropout', 0.1)
             self.max_seq_len = config_dict.get('data.max_seq_len')
     
     model_config = ModelConfig(config)
-    model = HistoryCentricModel(model_config)
+    model_name = config.get('model.name')
+    
+    if model_name == 'AdvancedTransformerV2':
+        model = AdvancedTransformerV2(model_config)
+    elif model_name == 'OptimizedHistoryAwareTransformer':
+        model = OptimizedHistoryAwareTransformer(model_config)
+    else:
+        model = HistoryCentricModel(model_config)
     num_params = model.count_parameters()
     
     logger.info(f"Model: {config.get('model.name')}")
